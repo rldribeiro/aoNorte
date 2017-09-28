@@ -1,9 +1,20 @@
 """
-Funções para me facilitarem a vida ao escrever as folhas de sala para a AoNorte.
+V.0.1 (2017/09/28):
+- Main file
+- Function 'sheet(films)': It grabs a list and prints a sheet with an entry for each film without aditional info.
+
+v.0.2:
+- Main: 'films' is now a list of tuples [('first line', 'second line')]
+- Function 'sheet(films)': code was simplified.
+- New Function: infofilm(film): for a film tuple, it grabs Director, Original Title, and Release Year.
 
 """
 
-# LISTA DE FILMES
+# IMPORTS
+
+import re
+
+# DATE OF SESSIONS, LIST OF FILMS
 
 date = ("2017", "Outubro")
 
@@ -22,27 +33,26 @@ Dia 13 – A MÃE, de Alberto Morais
 (La Madre, ESP/ FRA/ ROM, 2016, 89', M/12)
  
 Dia 16 – SÃO JORGE, de Marco Martins
-(POR, 2016, 112', M/12)
+(São Jorge, POR, 2016, 112', M/12)
  
 Dia 20 – OS CHAPÉUS-DE-CHUVA DE CHERBURG, de Jacques Demy
 (Les Parapluies de Cherbourg, FRA, 1964, 90', M/12)
  
 Dia 23 – GOOD TIME, de Josh Safdie, Benny Safdie
-(USA, 101', M/12)
+(Good Time, USA, 2017, 101', M/12)
  
 Dia 27 – AS DONZELAS DE ROCHEFORT, de Jacques Demy
 (Les Demoiselles de Rochefort, FRA, 1966, 120', M/12)
  
 Dia 30 – A FÁBRICA DE NADA, de Pedro Pinho
-(POR, 2017, 177', M/12)
+(A FÁBRICA DE NADA, POR, 2017, 177', M/12)
 
 """
 
 films = [film for film in films.split("\n") if len(film) > 1] # Removes empty strings in the list.
+films = list(zip(films[::2], films[1::2]))
 
 # FUNCTIONS
-
-import re
 
 def sheet(films):
     """
@@ -51,7 +61,7 @@ def sheet(films):
     Dia 30 – A FÁBRICA DE NADA, de Pedro Pinho
     (POR, 2017, 177', M/12)
     
-    The list has the format specified by 'heads'.
+    The sheet is formated as specified by 'heads'.
     
     """
     
@@ -74,18 +84,33 @@ Crítica:
 
 
 """
-    
     aonorte = open('AoNorte_' + date[0] + "_" + date[1] + '.txt','w')
     aonorte.write('SESSÕES CINECLUBISTAS AO NORTE | ' + date[1] + ' de ' + date[0] + "\n")
     
     print("\nWriting to file '" + aonorte.name + "':\n")
-    for i in range(len(films)):
-        if i%2 != 0:
-            film = films[i-1] + films[i]
-            print(films[i-1])
-            aonorte.write(heads.format(films[i-1], films[i]))
-            
+    
+    for film in films:
+        print(film[0])
+        aonorte.write(heads.format(film[0], film[1]))
+        
+        print("Director: {} | Title: {} | Year: {}".format(*filminfo(film)))
+        
     aonorte.close()
     print("\nDone!")
     
+def filminfo(film):
+    """
+    From each film entry in the following format:
+    
+    Dia 20 – OS CHAPÉUS-DE-CHUVA DE CHERBURG, de Jacques Demy
+    (Les Parapluies de Cherbourg, FRA, 1964, 90', M/12)
+    
+    It grabs the Original Title, Director, and Year and returns a tuple:
+    (Director, Original Title, Year)
+    """
+    film = film[0]+ " " + film[1]
+    info = re.search(r",\s?d?e? ([\w\s]*)\s\(([\w\s]*).*(\d{4})", film)
+    return (info.group(1), info.group(2).title(), info.group(3))
+    
 sheet(films)
+#filminfo(film)
