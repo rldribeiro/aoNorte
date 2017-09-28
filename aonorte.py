@@ -1,15 +1,3 @@
-"""
-V.0.1 (2017/09/28):
-- Main file
-- Function 'sheet(films)': It grabs a list and prints a sheet with an entry for each film without aditional info.
-
-v.0.2:
-- Main: 'films' is now a list of tuples [('first line', 'second line')]
-- Function 'sheet(films)': code was simplified.
-- New Function: infofilm(film): for a film tuple, it grabs Director, Original Title, and Release Year.
-
-"""
-
 # IMPORTS
 
 import re
