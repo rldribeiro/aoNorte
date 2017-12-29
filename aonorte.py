@@ -1,49 +1,47 @@
-date = ("2017", "Outubro")
+# Input
+
+date = ("2018", "Janeiro")
 
 films = """
 
-Dia 02 – A CIDADE PERDIDA DE Z, de James Gray
-(The Lost City of Z, EUA, 2016, 140', M/12)
-
-Dia 06 – OS DESASTRES DE SOFIA, de Christophe Honoré
-(Les malheurs de Sophie, FRA, 2016, 106', M/12)
  
-Dia 09 – A VIDA DE UMA MULHER, Stéphane Brizé
-(Une Vie, BEL/FRA, 2016, 119', M/12)
+Dia 05 – ROSAS DE ERMERA, de Luís Filipe Rocha
+(POR, 2017, 125', M/12)
  
-Dia 13 – A MÃE, de Alberto Morais
-(La Madre, ESP/ FRA/ ROM, 2016, 89', M/12)
+Dia 08 – 120 BATIMENTOS POR MINUTO, de Robin Campillo
+(120 Battements par Minute, FRA, 2017, 140', M/16)
  
-Dia 16 – SÃO JORGE, de Marco Martins
-(São Jorge, POR, 2016, 112', M/12)
-
-Dia 20 – OS CHAPÉUS-DE-CHUVA DE CHERBURG, de Jacques Demy
-(Les Parapluies de Cherbourg, FRA, 1964, 90', M/12)
+Dia 12 – A LIBERDADE DO DIABO, de Everardo González
+(La Libertad del Diablo, MEX, 2017, 74', M/12)
  
-Dia 23 – GOOD TIME, de Josh Safdie, Benny Safdie
-(Good Time, USA, 2017, 101', M/12)
-
-Dia 27 – AS DONZELAS DE ROCHEFORT, de Jacques Demy
-(Les Demoiselles de Rochefort, FRA, 1966, 120', M/12)
+Dia 15 – LUCKY, de John Carroll Lynch
+(EUA, 2017, 88', M/14)
  
-Dia 30 – A FÁBRICA DE NADA, de Pedro Pinho
-(A FÁBRICA DE NADA, POR, 2017, 177', M/12)
+Dia 19 – CORPO E ALMA, de Ildikó Enyedi
+(Teströl és lélekröl, HUN, 2017, 116', M/12)
+ 
+Dia 26 – VERÃO DANADO, de Pedro Cabeleira
+(POR, 2017, 127', M/14)
+ 
+Dia 29 – UMA MULHER FANTÁSTICA, de Sebastián Lelio
+(Una Mujer Fantastica, EUA/ ALE/ ESP/ Chile, 2017, 104', M/12)
+ 
 
 """
 
 
 
-# Transformar a string numa lista, removendo espaços em branco
+# String to list, removing whitespaces.
 films = [film for film in films.split("\n") if len(film) > 1] 
 films = list(zip(films[::2], films[1::2]))
 
-# Funções
+
 
 def sheet(films):
     """
-    Entrada: uma string com uma lista de filmes, segundo o modelo fornecido pela AoNorte.
+    Input: String with a list of films formated according to AoNorte.
     
-    Saída: um ficheiro .txt, com o formato das folhas de sala determinado por 'heads'.
+    Output: txt file with the detailed info for each film.
     
     """
     
@@ -69,7 +67,7 @@ Crítica:
     aonorte = open('AoNorte_' + date[0] + "_" + date[1] + '.txt','w')
     aonorte.write('SESSÕES CINECLUBISTAS AO NORTE | ' + date[1] + ' de ' + date[0] + "\n")
     
-    print("\nA escrever no ficheiro '" + aonorte.name + "':\n")
+    print("\nWriting to file '" + aonorte.name + "':\n")
     
     for film in films:
         print("..............", "\n")
@@ -82,39 +80,37 @@ Crítica:
 def filminfo(film):
     
     """
-    Para cada filme, esta função determina os links respectivos para o cinecartaz e o imdb. Depois recolhe toda a informação necessária de cada uma dessas páginas.
+    For each film, this function finds the corresponding links to cinecartaz and imdb, using duckduckgo search, then it retrieves all info from each page.
     
-    Entrada: tuple com o seguinte formato:
+    Input: tuple with following format:
     
     ('Dia 20 – OS CHAPÉUS-DE-CHUVA DE CHERBURG, de Jacques Demy', '    (Les Parapluies de Cherbourg, FRA, 1964, 90', M/12)')
     
     
-    Saída: tuple com actores, argumento, musica, cinematografia, edicao, sinopse
+    Output: tuple with actors, writers, music, cinematography, editing, sinopse.
     
     """
     
-    # Importações
-    import requests, re # Requests para gravar conteúdo da net; re para usar expressões regulares
-    from bs4 import BeautifulSoup # Para formatar as páginas
+    import requests, re # requests to grab content from net; re to use regular expressions
+    from bs4 import BeautifulSoup # BeautifulSoup to format the retrieved pages
     
-    # Criar uma string única para cada filme
     film = film[0] + " " + film[1]
     print(film)
     
-    # Título, realizador, ano
-    info = re.search(r"Dia\s\d+.{3}(.*),\s?d?e?([\w\s]*)\s\(([\w\s]*)\,.*(\d{4})", film)
+    # Title, Director, year
+    info = re.search(r"Dia\s\d+.{3}([\w\s'´`]*),\s?d?e?\s([\w\s]*)\s\(([\w\s'´`]*)\,.*(\d{4})", film)
     title, director, ortitle, year = info.group(1).title(), info.group(2),  info.group(3).title(), info.group(4)
     
-    # Adicionar '+' para usar nos padrões de procura
+    # Adding + to use in duckduckgo search pattern
     title = "+".join(title.split())
     director = "+".join(director.split())
     ortitle = "+".join(ortitle.split())
     
-    # Para cada fonte (cinecartaz, imdb, mais no futuro?) encontrar o link respectivo para cada filme
+    # Find cinecartaz and imdb links
     # source = [(name of source, regex string to find the code of source, url to replace), etc]
     sources = [("cinecartaz", r"cinecartaz\.publico\.pt[\w/\-]+?(\d+)", "http://m.cinecartaz.publico.pt/Mobile/Filmes/Index/{}"), 
                ("imdb", r"imdb\.com\/title\/([\w\d]+)", "http://www.imdb.com/title/{}/fullcredits/") ]
-    filmcodes = {} # Dicionário vazio para preencher com dados dos filmes
+    filmcodes = {}
     
     for source in sources:
         print("\nÀ procura em {}...".format(source[0]))
@@ -128,44 +124,48 @@ def filminfo(film):
         
         filmcodes[source[0]] = filmcode
     
-    # Processar as páginas para posterior pesquisa
+    # Format pages to ease the search
     cinecartaz = requests.get(filmcodes['cinecartaz'])
     cinecartaz = BeautifulSoup(cinecartaz.content, 'html.parser')
                    
     imdb = requests.get(filmcodes['imdb'])
     imdb = BeautifulSoup(imdb.content, 'html.parser')
     
-    # Pesquisa
-    # Interpretação (CINECARTAZ)
-    actores = re.findall(r'Actores[\n\r\t]([\w\s\-\'\,]*)[\n\r\t]Votar', cinecartaz.get_text())[0]
+
+    # Actors (cinecartaz)
+    actores = re.findall(r'Actores[\n\r\t]([\w\s\-\'\,]*)[\n\r\t]Votar', cinecartaz.get_text())
+    print(actores)
+    actores = actores[0] if len(actores) > 0  else " "
     print("\n")
     print("Interpretação:", actores)
     
-    # Argumento (IMDB)
-    argumento = re.search(r'(?<=Writing Credits).*?(?=Cast)', imdb.get_text(), flags=re.S).group()
+    # Writers (IMDB)
+    argumento = re.search(r'(?<=Writing Credits).*?(?=Cast)', imdb.get_text(), flags=re.S)
+    argumento = argumento.group() if argumento != None else " "
     argumento = ', '.join(re.findall(r'(\(?\w+(?:\s\w+)*\)?)', argumento))
     print("Argumento:", argumento)
     
-    # Música (IMDB)
+    # Music (IMDB)
     musica = re.search(r'(?<=Music by).*?(?=Cinematography)', imdb.get_text(), flags=re.S)
-    # No caso de não haver compositor, alterar o resultado para ' ' 
     musica = musica.group() if musica != None else " "
     musica = ', '.join(re.findall(r'(\(?\w+(?:\s\w+)*\)?)', musica))
     print("Música:", musica)
     
-    # Cinematografia (IMDB)
-    cinematografia = re.search(r'(?<=Cinematography by).*?(?=Film Editing)', imdb.get_text(), flags=re.S).group()
+    # Cinematography (IMDB)
+    cinematografia = re.search(r'(?<=Cinematography by).*?(?=Film Editing)', imdb.get_text(), flags=re.S)
+    cinematografia = cinematografia.group() if cinematografia != None else " "
     cinematografia = ', '.join(re.findall(r'(\(?\w+(?:\s\w+)*\)?)', cinematografia))
     print("Cinematografia:", cinematografia)
     
-    # Edição (IMDB)
-    edicao = re.search(r'(?<=Film Editing by).*?(?=\w+ [bB]y)', imdb.get_text(), flags=re.S).group()
+    # Editing (IMDB)
+    edicao = re.search(r'(?<=Film Editing by).*?(?=\w+ [bB]y)', imdb.get_text(), flags=re.S)
+    edicao = edicao.group() if edicao != None else " "
     edicao = ', '.join(re.findall(r'(\(?\w+(?:\s\w+)*\)?)', edicao))
     print("Edição:", edicao)
     
     # Sinopse (CINECARTAZ)
-    sinopse = cinecartaz.find(id="ContentDescription").get_text()[:-10]
-    # [:-10] para obter o texto sem o "PÚBLICO" no final.
+    sinopse = cinecartaz.find(id="ContentDescription")
+    sinopse = sinopse.get_text()[:-9] if sinopse != None else " "
     print("\nSinopse:", sinopse)
 
     return actores, argumento, musica, cinematografia, edicao, sinopse
